@@ -51,6 +51,8 @@ dependencies {
 
     implementation(libs.kotlinx.serialization)
     implementation(libs.retrofit)
+    implementation(libs.retrofit.serialization.converter)
+
     implementation(libs.hilt.android)
     implementation(libs.room.ktx)
     implementation(libs.coroutines.core)
@@ -62,6 +64,9 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.preview)
     implementation(libs.compose.material3)
+
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+
 
     testImplementation(libs.junit)
 }

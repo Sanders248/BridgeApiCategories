@@ -13,6 +13,7 @@ andrdoidXLifecycle = "2.5.1"
 coil = "2.2.2"
 kotlinXSerialization = "1.4.1"
 retrofit = "2.9.0"
+retrofitKotlinxSerialization = "0.8.0"
 room = "2.5.0"
 coroutine = "1.6.4"
 
@@ -46,6 +47,7 @@ compose-hilt-navigation = { group = "androidx.hilt", name = "hilt-navigation-com
 
 kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinXSerialization" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinxSerialization" }
 
 
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
