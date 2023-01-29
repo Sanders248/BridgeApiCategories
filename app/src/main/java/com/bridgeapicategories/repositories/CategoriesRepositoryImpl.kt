@@ -8,6 +8,7 @@ import com.bridgeapicategories.repositories.apiservices.toCategoryTable
 import com.bridgeapicategories.repositories.localservice.CategoryDao
 import com.bridgeapicategories.repositories.localservice.toCategory
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -18,7 +19,7 @@ class CategoriesRepositoryImpl @Inject constructor(
 
     override val categories: Flow<List<Category>> = categoryDao.getAlphabetizedCategories().map {
         it.map(::toCategory)
-    }
+    }.distinctUntilChanged()
 
     override suspend fun refresh(): Result<Unit> = apiCall {
         apiService.getCategories()

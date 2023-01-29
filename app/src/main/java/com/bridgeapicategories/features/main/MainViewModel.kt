@@ -24,13 +24,6 @@ class MainViewModel @Inject constructor(
         .combine(displayedCategoryFlow) { categories, displayedCategories ->
             categories
                 .toDisplayedCategories(displayedCategories)
-                .sortedBy { it is DisplayedCategory.SubCategory }
-                .sortedBy {
-                    when(it) {
-                        is DisplayedCategory.SubCategory -> it.parentId
-                        is DisplayedCategory.ParentCategory -> it.id
-                    }
-                }
         }.asLiveData()
 
     init {
