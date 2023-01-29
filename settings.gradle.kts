@@ -12,5 +12,6 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+
 rootProject.name = "BridgeApiCategories"
-include ':app'
+include(":app")
