@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bridgeapicategories.domains.models.Category
 import com.bridgeapicategories.domains.usecases.CategoriesUseCase
+import com.bridgeapicategories.features.main.models.DisplayedCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -22,45 +23,44 @@ class MainViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             categoriesUseCase.getCategories()
-                .map {
-                    _categories.value = it.map {
-                        DisplayedCategory(
-                            id = it.id,
-                            name = it.name,
-                            isParentCategory = true
-                        )
-                    }
+                .map { categories ->
+                    _categories.value = categories.toDisplayedCategories()
                 }.onFailure {
-                   // TODO
+                    // TODO
                 }
         }
     }
 
     fun onCategoryClicked(id: Int) {
-        viewModelScope.launch {
-            categoriesUseCase.getCategories().map { categories ->
-                val subcategories = categories.firstOrNull { it.id == id }?.subCategories.orEmpty().map {
-                    DisplayedCategory(
-                        id = it.id,
-                        name = it.name,
-                        isParentCategory = false
-                    )
-                }
+        val categories = _categories.value ?: return
 
-                val categoriesValue = _categories.value
-
-                _categories.value = categoriesValue?.toMutableList()?.apply {
-                    addAll(
-                        categoriesValue.indexOfFirst { it.id == id }, subcategories
-                    )
-                }
-            }
+        _categories.value = categories.map {
+            if (it is DisplayedCategory.SubCategory && it.id == id) {
+                it.copy(isDisplayed = !it.isDisplayed)
+            } else it
         }
     }
-}
 
-data class DisplayedCategory(
-    val id: Int,
-    val name: String,
-    val isParentCategory: Boolean
-)
+    private fun Set<Category>.toDisplayedCategories(): List<DisplayedCategory> {
+        val displayedCategories = mutableListOf<DisplayedCategory>()
+
+        forEach { category ->
+            displayedCategories.add(
+                DisplayedCategory.ParentCategory(
+                    id = category.id,
+                    name = category.name,
+                )
+            )
+            category.subCategories.forEach { subcategory ->
+                displayedCategories.add(
+                    DisplayedCategory.SubCategory(
+                        id = category.id,
+                        name = subcategory.name,
+                        isDisplayed = false
+                    )
+                )
+            }
+        }
+        return displayedCategories
+    }
+}
