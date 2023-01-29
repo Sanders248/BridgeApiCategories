@@ -11,7 +11,8 @@ class CategoriesRepositoryImpl @Inject constructor(
 ): CategoriesRepository {
     override suspend fun getCategories(): Result<Set<Category>> = apiCall {
         apiService.getCategories()
-    }.map { categoriesResponse ->
+    }.map { categoryCoreResponse ->
+        val categoriesResponse = categoryCoreResponse.resources
         val categories  = mutableSetOf<Category>()
 
         // Add all parents categories

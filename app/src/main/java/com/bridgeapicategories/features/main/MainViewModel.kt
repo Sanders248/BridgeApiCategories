@@ -24,7 +24,8 @@ class MainViewModel @Inject constructor(
                 .onSuccess {
                     _categories.value = it.toList()
                 }.onFailure {
-                    // TODO
+                    println("yooy" + it)
+                    val e = it
                 }
         }
     }
