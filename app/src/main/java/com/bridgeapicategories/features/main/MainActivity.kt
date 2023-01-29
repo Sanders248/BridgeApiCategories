@@ -9,7 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.bridgeapicategories.features.main.ui.MainScreen
-import com.bridgeapicategories.ui.theme.BridgeApiCategoriesTheme
+import com.bridgeapicategories.features.main.ui.theme.BridgeApiCategoriesTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

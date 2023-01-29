@@ -13,30 +13,30 @@ class CategoriesRepositoryImpl @Inject constructor(
         apiService.getCategories()
     }.map { categoryCoreResponse ->
         val categoriesResponse = categoryCoreResponse.resources
-        val categories  = mutableSetOf<Category>()
+        val categories  = mutableListOf<Category>()
 
         // Add all parents categories
-        categoriesResponse.map { categoryResponse ->
+        categoriesResponse.forEach { categoryResponse ->
             if (categoryResponse.parent == null) {
                 categories.add(categoryResponse.toCategory())
             }
         }
 
         // Add all subcategories in their parents
-        categoriesResponse.map { categoryResponse ->
+        categoriesResponse.forEach { categoryResponse ->
             if (categoryResponse.parent != null) {
-                val parent = categories
-                    .firstOrNull { it.id == categoryResponse.parent.id } ?: return@map
+                categories.firstOrNull { it.id == categoryResponse.parent.id }?.let { parent ->
+                    val subCategories = parent.subCategories.toMutableSet().apply {
+                        add(categoryResponse.toCategory())
+                    }
+                    val parentUpdated = parent.copy(subCategories = subCategories)
 
-                val subCategories = parent.subCategories.toMutableSet().apply {
-                    add(categoryResponse.toCategory())
+                    categories.removeIf { it.id == categoryResponse.parent.id }
+                    categories.add(parentUpdated)
                 }
-                val parentUpdated = parent.copy(subCategories = subCategories)
-
-                categories.add(parentUpdated)
             }
         }
 
-        categories
+        categories.toSet()
     }
 }

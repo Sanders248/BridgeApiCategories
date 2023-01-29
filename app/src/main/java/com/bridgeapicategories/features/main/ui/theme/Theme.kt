@@ -1,4 +1,4 @@
-package com.bridgeapicategories.ui.theme
+package com.bridgeapicategories.features.main.ui.theme
 
 import android.app.Activity
 import android.os.Build
