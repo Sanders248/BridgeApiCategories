@@ -60,6 +60,10 @@ dependencies {
     
     implementation(libs.androidx.core)
     implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.lifecycle.livedata)
+    implementation(libs.compose.livedata)
+
     implementation(libs.compose.activity)
     implementation(libs.compose.ui)
     implementation(libs.compose.preview)

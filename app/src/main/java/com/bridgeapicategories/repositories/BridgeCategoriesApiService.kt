@@ -5,6 +5,6 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 interface BridgeCategoriesApiService {
-    @GET
+    @GET("categories.json")
     suspend fun getCategories(): Response<List<CategoryResponse>>
 }

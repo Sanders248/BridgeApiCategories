@@ -34,6 +34,6 @@ class NetworkModule {
         .build()
 
     private companion object {
-        const val BASE_URL = "https://rickandmortyapi.com/api/"
+        const val BASE_URL = "https://raw.githubusercontent.com/bankin-engineering/challenge-android/master/"
     }
 }
