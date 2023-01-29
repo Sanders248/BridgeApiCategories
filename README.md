@@ -8,5 +8,5 @@ This application display a list of categories and subcategories
 - retrofit and kotlin  serialization to get the categories from the api
 
 ## Still TODO
-- Use room to display categories offline 
+- Optimise category order
 - Add tests

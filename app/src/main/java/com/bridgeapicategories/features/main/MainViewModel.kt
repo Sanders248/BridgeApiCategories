@@ -1,15 +1,15 @@
 package com.bridgeapicategories.features.main
 
-import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.bridgeapicategories.domains.models.Category
 import com.bridgeapicategories.domains.usecases.CategoriesUseCase
 import com.bridgeapicategories.features.main.models.DisplayedCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
