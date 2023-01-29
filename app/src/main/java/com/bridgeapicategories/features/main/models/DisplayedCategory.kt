@@ -1,17 +1,16 @@
 package com.bridgeapicategories.features.main.models
 
 sealed interface DisplayedCategory {
-    val id: Int
     val name: String
 
     data class ParentCategory(
-        override val id: Int,
         override val name: String,
+        val id: Int,
     ) : DisplayedCategory
 
     data class SubCategory(
-        override val id: Int,
         override val name: String,
+        val parentId: Int,
         val isDisplayed: Boolean
     ) : DisplayedCategory
 }

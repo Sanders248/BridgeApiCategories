@@ -1,14 +1,15 @@
 package com.bridgeapicategories.features.main
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.*
 import com.bridgeapicategories.domains.models.Category
 import com.bridgeapicategories.domains.usecases.CategoriesUseCase
 import com.bridgeapicategories.features.main.models.DisplayedCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,50 +18,46 @@ class MainViewModel @Inject constructor(
     private val categoriesUseCase: CategoriesUseCase
 ) : ViewModel() {
 
-    private val _categories: MutableLiveData<List<DisplayedCategory>> = MutableLiveData()
-    val categories: LiveData<List<DisplayedCategory>> get() = _categories
+    private val displayedCategoryFlow = MutableStateFlow(emptySet<Int>())
+
+    val categories: LiveData<List<DisplayedCategory>> = categoriesUseCase.categories
+        .combine(displayedCategoryFlow) { categories, displayedCategories ->
+            categories
+                .toDisplayedCategories(displayedCategories)
+                .sortedBy { it is DisplayedCategory.SubCategory }
+                .sortedBy {
+                    when(it) {
+                        is DisplayedCategory.SubCategory -> it.parentId
+                        is DisplayedCategory.ParentCategory -> it.id
+                    }
+                }
+        }.asLiveData()
 
     init {
         viewModelScope.launch {
-            categoriesUseCase.getCategories()
-                .map { categories ->
-                    _categories.value = categories.toDisplayedCategories()
-                }.onFailure {
-                    // TODO
-                }
+            categoriesUseCase.refresh()
         }
     }
 
     fun onCategoryClicked(id: Int) {
-        val categories = _categories.value ?: return
-
-        _categories.value = categories.map {
-            if (it is DisplayedCategory.SubCategory && it.id == id) {
-                it.copy(isDisplayed = !it.isDisplayed)
-            } else it
+        viewModelScope.launch {
+            if (id in displayedCategoryFlow.value) {
+                displayedCategoryFlow.emit(displayedCategoryFlow.value - id)
+            } else {
+                displayedCategoryFlow.emit(displayedCategoryFlow.value + id)
+            }
         }
     }
 
-    private fun Set<Category>.toDisplayedCategories(): List<DisplayedCategory> {
-        val displayedCategories = mutableListOf<DisplayedCategory>()
-
-        forEach { category ->
-            displayedCategories.add(
-                DisplayedCategory.ParentCategory(
-                    id = category.id,
-                    name = category.name,
-                )
-            )
-            category.subCategories.forEach { subcategory ->
-                displayedCategories.add(
-                    DisplayedCategory.SubCategory(
-                        id = category.id,
-                        name = subcategory.name,
-                        isDisplayed = false
-                    )
-                )
-            }
-        }
-        return displayedCategories
+    private fun List<Category>.toDisplayedCategories(displayedCategories: Set<Int>): List<DisplayedCategory> = map { category ->
+        if (category.parentId != null) DisplayedCategory.SubCategory(
+            name  =  category.name,
+            parentId = category.parentId,
+            isDisplayed = category.parentId in displayedCategories
+        )
+        else DisplayedCategory.ParentCategory(
+            name = category.name,
+            id = category.id
+        )
     }
 }

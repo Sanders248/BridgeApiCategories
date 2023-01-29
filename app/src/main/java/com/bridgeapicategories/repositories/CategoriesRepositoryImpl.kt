@@ -3,40 +3,30 @@ package com.bridgeapicategories.repositories
 import com.bridgeapicategories.domains.models.Category
 import com.bridgeapicategories.domains.repositories.CategoriesRepository
 import com.bridgeapicategories.libraries.network.apiCall
-import com.bridgeapicategories.repositories.mappers.toCategory
+import com.bridgeapicategories.repositories.apiservices.BridgeCategoriesApiService
+import com.bridgeapicategories.repositories.apiservices.toCategoryTable
+import com.bridgeapicategories.repositories.localservice.CategoryDao
+import com.bridgeapicategories.repositories.localservice.toCategory
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class CategoriesRepositoryImpl @Inject constructor(
-    private val apiService: BridgeCategoriesApiService
+    private val apiService: BridgeCategoriesApiService,
+    private val categoryDao: CategoryDao
 ): CategoriesRepository {
-    override suspend fun getCategories(): Result<Set<Category>> = apiCall {
+
+    override val categories: Flow<List<Category>> = categoryDao.getAlphabetizedCategories().map {
+        it.map(::toCategory)
+    }
+
+    override suspend fun refresh(): Result<Unit> = apiCall {
         apiService.getCategories()
     }.map { categoryCoreResponse ->
-        val categoriesResponse = categoryCoreResponse.resources
-        val categories  = mutableListOf<Category>()
-
-        // Add all parents categories
-        categoriesResponse.forEach { categoryResponse ->
-            if (categoryResponse.parent == null) {
-                categories.add(categoryResponse.toCategory())
-            }
-        }
-
-        // Add all subcategories in their parents
-        categoriesResponse.forEach { categoryResponse ->
-            if (categoryResponse.parent != null) {
-                categories.firstOrNull { it.id == categoryResponse.parent.id }?.let { parent ->
-                    val subCategories = parent.subCategories.toMutableSet().apply {
-                        add(categoryResponse.toCategory())
-                    }
-                    val parentUpdated = parent.copy(subCategories = subCategories)
-
-                    categories.removeIf { it.id == categoryResponse.parent.id }
-                    categories.add(parentUpdated)
-                }
-            }
-        }
-
-        categories.toSet()
-    }
+       categoryCoreResponse.resources.map {
+           it.toCategoryTable()
+       }
+    }.onSuccess {
+        categoryDao.insertAll(it)
+    }.map { Result.success(Unit) }
 }

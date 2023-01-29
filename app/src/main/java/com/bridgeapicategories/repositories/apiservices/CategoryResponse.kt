@@ -1,4 +1,4 @@
-package com.bridgeapicategories.repositories.entities
+package com.bridgeapicategories.repositories.apiservices
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -43,8 +43,8 @@ data class CategoryResponse(
 data class ParentCategoryResponse(
     @SerialName("id")
     val id: Int,
-    @SerialName("resourceUri")
+    @SerialName("resource_uri")
     val resourceUri: String? = null,
-    @SerialName("resourceType")
+    @SerialName("resource_type")
     val resourceType: String? = null,
 )

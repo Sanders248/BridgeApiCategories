@@ -1,6 +1,5 @@
-package com.bridgeapicategories.repositories
+package com.bridgeapicategories.repositories.apiservices
 
-import com.bridgeapicategories.repositories.entities.CategoryCoreResponse
 import retrofit2.Response
 import retrofit2.http.GET
 
